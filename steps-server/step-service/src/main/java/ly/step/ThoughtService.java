@@ -18,7 +18,7 @@ public interface ThoughtService {
     public Thought findById(long id);
 
     /**
-     * 查找用户的Thought列表， 也就是时间线。按时间倒序排列
+     * 查找用户的Thought列表。按时间倒序排列
      * 
      * @param userId
      *            用户的ID
@@ -28,9 +28,25 @@ public interface ThoughtService {
      *            最多查询的ID, 结果中的ID都会小于这个值。
      * @param limit
      *            结果最多返回的内容
-     * @return 查询结果，如果没有符合条件的记录。则会返回一个空的List对象
+     * @return 符合条件的Thought的ID号。如果没有符合条件的记录。则会返回一个空的List对象
      */
-    public List<Thought> findByUser(long userId, long sinceId, long maxId,
+    public List<Long> findByUser(long userId, long sinceId, long maxId,
+	    int limit);
+
+    /**
+     * 查找用户的 时间线， 包含用户的和这个用户朋友的时间线
+     * 
+     * @param userId
+     *            用户的ID
+     * @param sinceId
+     *            开始查询的ID, 结果中的ID都会大于这个值。
+     * @param maxId
+     *            最多查询的ID, 结果中的ID都会小于这个值。
+     * @param limit
+     *            结果最多返回的内容
+     * @return 符合条件的Thought的ID号。如果没有符合条件的记录。则会返回一个空的List对象
+     */
+    public List<Long> findInTimeline(long userId, long sinceId, long maxId,
 	    int limit);
 
     /**

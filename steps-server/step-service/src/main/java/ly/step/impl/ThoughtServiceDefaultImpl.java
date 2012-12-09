@@ -1,35 +1,102 @@
 package ly.step.impl;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PreDestroy;
 
 import ly.step.Thought;
 import ly.step.ThoughtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ThoughtServiceDefaultImpl implements ThoughtService {
 
     @Autowired
-    private ThoughtDao thoughtDAO;
+    private ThoughtDao thoughtDao;
     @Autowired
     private UserToThoughtDao userToThoughtDAO;
+    @Autowired
+    private UserRelationDao userRelationDao;
+
+    // Well，we have an unbounded queue.
+    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+	    1,
+	    10,
+	    1,
+	    TimeUnit.MINUTES,
+	    new LinkedBlockingQueue<Runnable>());
 
     @Override
     public Thought findById(long id) {
-	return thoughtDAO.findById(id);
+	return thoughtDao.findById(id);
     }
 
+    /**
+     * Graceful shutdown this service, deallocate resource if needed.
+     */
+    @PreDestroy
+    public void shutdown() {
+	threadPoolExecutor.shutdown();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.ThoughtService#findByUser(long, long, long, int)
+     */
     @Override
-    public List<Thought> findByUser(long userId, long sinceId, long maxId,
+    public List<Long> findByUser(long userId, long sinceId, long maxId,
 	    int limit) {
-	// TODO Auto-generated method stub
-	return null;
+	return thoughtDao.findByUser(userId, sinceId, maxId, limit);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.ThoughtService#post(ly.step.Thought)
+     */
     @Override
     public long post(Thought thought) {
-	// TODO Auto-generated method stub
+	// 保存
+	thoughtDao.save(thought);
+	userToThoughtDAO.save(thought.getAuthorId(), thought.getId());
+	// 启动广播
+	broadcast(thought);
 	return 0;
+    }
+
+    private void broadcast(final Thought thought) {
+	// Next time, we may introduce a messaging service :-)
+	threadPoolExecutor.execute(new Runnable() {
+
+	    @Override
+	    public void run() {
+		List<Long> friendList = userRelationDao
+			.findFriendsByUserId(thought
+				.getAuthorId());
+		for (Long friend : friendList) {
+		    userToThoughtDAO.save(
+			    friend,
+			    thought.getId());
+		}
+	    }
+	});
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.ThoughtService#findInTimeline(long, long, long, int)
+     */
+    @Override
+    public List<Long> findInTimeline(long userId, long sinceId, long maxId,
+	    int limit) {
+	return userToThoughtDAO.findByUserId(userId, sinceId, maxId, limit);
     }
 
 }

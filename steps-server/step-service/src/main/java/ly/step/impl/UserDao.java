@@ -11,5 +11,4 @@ public interface UserDao {
      * @return
      */
     User findById(long id);
-
 }

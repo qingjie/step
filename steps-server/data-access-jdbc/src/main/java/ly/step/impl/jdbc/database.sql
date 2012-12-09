@@ -40,3 +40,11 @@ CREATE TABLE IF NOT EXISTS Ticket (
 	user_id BIGINT NOT NULL,
 	PRIMARY KEY (code)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS USER_RELATION (
+	friend_a BIGINT NOT NULL,
+	friend_b BIGINT NOT NULL,
+	created_at BIGINT,
+	UNIQUE INDEX idx_user_relation_a_b (friend_a, friend_b),
+	UNIQUE INDEX idx_user_relation_a_b (friend_b, friend_a)
+) ENGINE = InnoDB;
