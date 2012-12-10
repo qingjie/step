@@ -18,31 +18,32 @@ public class ThoughtDaoJdbcImpl extends JdbcDaoSupport implements ThoughtDao {
 
     private static final String SQL_FIND_BY_USER_PREFIX = "select id from Thought"
 	    + " where author_id = ? ";
-    private static final String SQL_FIND_BY_USER_POSTFIX = " order by thought_id desc limit ?";
+    private static final String SQL_FIND_BY_USER_POSTFIX = " order by id desc limit ?";
     private static final String SQL_FIND_BY_ID = "select * from Thought " +
-	    "where id = ? order by created_at desc";
-    private static final String SQL_INSERT = "insert into Thought (id, `text`, author_id, createdAt) values (?, ?, ?, ?)";
+	    "where id = ? order by id desc";
+    private static final String SQL_INSERT = "insert into Thought " +
+	    "(id, `text`, author_id, created_at) values (?, ?, ?, ?)";
 
     @Override
     public Thought findById(long id) {
 	return this.getJdbcTemplate().queryForObject(
-		SQL_FIND_BY_ID, new Object[] { id },
-		new RowMapper<Thought>() {
+	        SQL_FIND_BY_ID, new Object[] { id },
+	        new RowMapper<Thought>() {
 
 		    @Override
 		    public Thought mapRow(ResultSet rs, int rowNum)
-			    throws SQLException {
-			return Thought
-				.newBuilder()
-				.setId(rs.getLong("id"))
-				.setAuthorId(rs.getLong("author_id"))
-				.setText(rs.getString("text"))
-				.setCreatedAt(
-					new Date(rs.getLong("created_at")))
-				.build();
+		            throws SQLException {
+		        return Thought
+		                .newBuilder()
+		                .setId(rs.getLong("id"))
+		                .setAuthorId(rs.getLong("author_id"))
+		                .setText(rs.getString("text"))
+		                .setCreatedAt(
+		                        new Date(rs.getLong("created_at")))
+		                .build();
 		    }
 
-		});
+	        });
     }
 
     @Override
@@ -60,13 +61,14 @@ public class ThoughtDaoJdbcImpl extends JdbcDaoSupport implements ThoughtDao {
 	    params.add(maxId);
 	}
 	query.append(SQL_FIND_BY_USER_POSTFIX);
+	params.add(limit);
 
 	return this
-		.getJdbcTemplate()
-		.queryForList(
-			query.toString(),
-			params.toArray(),
-			Long.class);
+	        .getJdbcTemplate()
+	        .queryForList(
+	                query.toString(),
+	                params.toArray(),
+	                Long.class);
     }
 
     @Override
@@ -74,10 +76,10 @@ public class ThoughtDaoJdbcImpl extends JdbcDaoSupport implements ThoughtDao {
 	// TODO: introducing a id generator will be help. :-)
 	long id = System.currentTimeMillis();
 	getJdbcTemplate().update(SQL_INSERT, new Object[] {
-		id,
-		thought.getText(),
-		thought.getAuthorId(),
-		thought.getCreatedAt()
+	        id,
+	        thought.getText(),
+	        thought.getAuthorId(),
+	        thought.getCreatedAt().getTime()
 	});
 	return thought.toBuilder().setId(id).build();
     }
