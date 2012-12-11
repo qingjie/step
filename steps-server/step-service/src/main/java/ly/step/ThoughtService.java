@@ -13,9 +13,11 @@ public interface ThoughtService {
      * 查找某个Thought， 按ID号查找
      * 
      * @param id
-     * @return 如果返回null， 则意味着没有找到
+     * @return Thought
+     * @exception ThoughtNotFoundException
+     *                没有找到
      */
-    public Thought findById(long id);
+    public Thought findById(long id) throws ThoughtNotFoundException;
 
     /**
      * 查找用户的Thought列表。按时间倒序排列

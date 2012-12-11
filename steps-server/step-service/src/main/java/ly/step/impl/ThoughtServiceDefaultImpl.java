@@ -31,17 +31,27 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
 	    TimeUnit.MINUTES,
 	    new LinkedBlockingQueue<Runnable>());
 
+    private void broadcast(final Thought thought) {
+	// Next time, we may introduce a messaging service :-)
+	threadPoolExecutor.execute(new Runnable() {
+
+	    @Override
+	    public void run() {
+		List<Long> friendList = userRelationDao
+		        .findFriendsByUserId(thought
+		                .getAuthorId());
+		for (Long friend : friendList) {
+		    userToThoughtDAO.save(
+			    friend,
+			    thought.getId());
+		}
+	    }
+	});
+    }
+
     @Override
     public Thought findById(long id) {
 	return thoughtDao.findById(id);
-    }
-
-    /**
-     * Graceful shutdown this service, deallocate resource if needed.
-     */
-    @PreDestroy
-    public void shutdown() {
-	threadPoolExecutor.shutdown();
     }
 
     /*
@@ -58,45 +68,35 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
     /*
      * (non-Javadoc)
      * 
-     * @see ly.step.ThoughtService#post(ly.step.Thought)
-     */
-    @Override
-    public long post(Thought thought) {
-	// 保存
-	thoughtDao.save(thought);
-	userToThoughtDAO.save(thought.getAuthorId(), thought.getId());
-	// 启动广播
-	broadcast(thought);
-	return 0;
-    }
-
-    private void broadcast(final Thought thought) {
-	// Next time, we may introduce a messaging service :-)
-	threadPoolExecutor.execute(new Runnable() {
-
-	    @Override
-	    public void run() {
-		List<Long> friendList = userRelationDao
-			.findFriendsByUserId(thought
-				.getAuthorId());
-		for (Long friend : friendList) {
-		    userToThoughtDAO.save(
-			    friend,
-			    thought.getId());
-		}
-	    }
-	});
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see ly.step.ThoughtService#findInTimeline(long, long, long, int)
      */
     @Override
     public List<Long> findInTimeline(long userId, long sinceId, long maxId,
 	    int limit) {
 	return userToThoughtDAO.findByUserId(userId, sinceId, maxId, limit);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.ThoughtService#post(ly.step.Thought)
+     */
+    @Override
+    public long post(Thought thought) {
+	// 保存
+	Thought persistenced = thoughtDao.save(thought);
+	userToThoughtDAO.save(thought.getAuthorId(), thought.getId());
+	// 启动广播
+	broadcast(thought);
+	return persistenced.getId();
+    }
+
+    /**
+     * Graceful shutdown this service, deallocate resource if needed.
+     */
+    @PreDestroy
+    public void shutdown() {
+	threadPoolExecutor.shutdown();
     }
 
 }

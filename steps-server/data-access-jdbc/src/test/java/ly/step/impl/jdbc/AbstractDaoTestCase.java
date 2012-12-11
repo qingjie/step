@@ -8,13 +8,26 @@ import javax.sql.DataSource;
 import org.junit.BeforeClass;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.io.Resources;
 
 public class AbstractDaoTestCase {
 
     private static DriverManagerDataSource driverManagerDataSource;
+    private static DataSourceTransactionManager dataSourceTransactionManager;
+
+    private static TransactionTemplate transactionTemplate;
+
+    protected static final DataSource getDataSource() {
+	return driverManagerDataSource;
+    }
+
+    protected static final TransactionTemplate getTransactionTemplate() {
+	return transactionTemplate;
+    }
 
     @BeforeClass
     public static void setupDbConnection() throws ClassNotFoundException {
@@ -24,6 +37,12 @@ public class AbstractDaoTestCase {
 		    "jdbc:mysql://localhost/step-test?useUnicode=true&characterEncoding=utf8",
 		    "step-test", "step-test");
 	}
+
+	dataSourceTransactionManager = new DataSourceTransactionManager(
+	        driverManagerDataSource);
+
+	transactionTemplate = new TransactionTemplate(
+	        dataSourceTransactionManager);
     }
 
     private JdbcTemplate jdbcTemplate;
@@ -38,10 +57,6 @@ public class AbstractDaoTestCase {
 	getJdbcTemplate().execute(Resources.toString(
 	        Resources.getResource("db-script/" + tableName + ".sql"),
 	        Charset.forName("utf-8")));
-    }
-
-    protected final DataSource getDataSource() {
-	return driverManagerDataSource;
     }
 
     protected final JdbcTemplate getJdbcTemplate() {

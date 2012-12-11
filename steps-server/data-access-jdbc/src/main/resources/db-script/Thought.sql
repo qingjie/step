@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS Thought(
-	`id` bigint NOT NULL,
+	`id` SERIAL,
 	`author_id` bigint NOT NULL,
 	`text` text NOT NULL,
 	`created_at` bigint DEFAULT NULL,

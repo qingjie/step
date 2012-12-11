@@ -12,6 +12,7 @@ import ly.step.impl.ThoughtDao;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class ThoughtDaoJdbcImpl extends JdbcDaoSupport implements ThoughtDao {
@@ -72,8 +73,9 @@ public class ThoughtDaoJdbcImpl extends JdbcDaoSupport implements ThoughtDao {
     }
 
     @Override
+    @Transactional
     public Thought save(Thought thought) {
-	// TODO: introducing a id generator will be help. :-)
+	// TODO: introducing an id generator will be help. :-)
 	long id = System.currentTimeMillis();
 	getJdbcTemplate().update(SQL_INSERT, new Object[] {
 	        id,
