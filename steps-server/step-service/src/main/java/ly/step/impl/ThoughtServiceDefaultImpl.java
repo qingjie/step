@@ -1,20 +1,25 @@
 package ly.step.impl;
 
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PreDestroy;
 
 import ly.step.Thought;
 import ly.step.ThoughtService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ThoughtServiceDefaultImpl implements ThoughtService {
+
+    /**
+     * 单次广播的最大数量， 嗯先支持这些吧。
+     */
+    private static final int MAX_BROADCAST = 15;
+
+    private static final Logger logger = LoggerFactory
+	    .getLogger(ThoughtServiceDefaultImpl.class);
 
     @Autowired
     private ThoughtDao thoughtDao;
@@ -23,30 +28,25 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
     @Autowired
     private UserRelationDao userRelationDao;
 
-    // Well，we have an unbounded queue.
-    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-	    1,
-	    10,
-	    1,
-	    TimeUnit.MINUTES,
-	    new LinkedBlockingQueue<Runnable>());
-
     private void broadcast(final Thought thought) {
-	// Next time, we may introduce a messaging service :-)
-	threadPoolExecutor.execute(new Runnable() {
-
-	    @Override
-	    public void run() {
-		List<Long> friendList = userRelationDao
-		        .findFriendsByUserId(thought
-		                .getAuthorId());
-		for (Long friend : friendList) {
-		    userToThoughtDAO.save(
-			    friend,
-			    thought.getId());
-		}
+	List<Long> friendList = userRelationDao
+	        .findFriendsByUserId(thought
+	                .getAuthorId());
+	logger.debug("Will Broadcast thought {} to {} friends.",
+	        thought.getId(), friendList.size());
+	if (friendList.size() > 15) {
+	    logger.warn("There {} in a batch for thought {}!",
+		    friendList.size(), thought.getId());
+	}
+	int counter = 0;
+	for (Long friend : friendList) {
+	    if (counter++ > MAX_BROADCAST) {
+		break;
 	    }
-	});
+	    userToThoughtDAO.save(
+		    friend,
+		    thought.getId());
+	}
     }
 
     @Override
@@ -90,13 +90,4 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
 	broadcast(thought);
 	return persistenced.getId();
     }
-
-    /**
-     * Graceful shutdown this service, deallocate resource if needed.
-     */
-    @PreDestroy
-    public void shutdown() {
-	threadPoolExecutor.shutdown();
-    }
-
 }
