@@ -24,7 +24,7 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
     @Autowired
     private ThoughtDao thoughtDao;
     @Autowired
-    private UserToThoughtDao userToThoughtDAO;
+    private UserToThoughtDao userToThoughtDao;
     @Autowired
     private UserRelationDao userRelationDao;
 
@@ -32,20 +32,17 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
 	List<Long> friendList = userRelationDao
 	        .findFriendsByUserId(thought
 	                .getAuthorId());
-	logger.debug("Will Broadcast thought {} to {} friends.",
-	        thought.getId(), friendList.size());
+	logger.info("Will broadcast thought {} to {} friends: {}.",
+	        new Object[] { thought.getId(), friendList.size(), friendList });
 	if (friendList.size() > 15) {
 	    logger.warn("There {} in a batch for thought {}!",
 		    friendList.size(), thought.getId());
 	}
-	int counter = 0;
+	if (friendList.size() > MAX_BROADCAST) {
+	    friendList = friendList.subList(0, MAX_BROADCAST);
+	}
 	for (Long friend : friendList) {
-	    if (counter++ > MAX_BROADCAST) {
-		break;
-	    }
-	    userToThoughtDAO.save(
-		    friend,
-		    thought.getId());
+	    userToThoughtDao.save(friend, thought.getId());
 	}
     }
 
@@ -73,7 +70,7 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
     @Override
     public List<Long> findInTimeline(long userId, long sinceId, long maxId,
 	    int limit) {
-	return userToThoughtDAO.findByUserId(userId, sinceId, maxId, limit);
+	return userToThoughtDao.findByUserId(userId, sinceId, maxId, limit);
     }
 
     /*
@@ -85,9 +82,9 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
     public long post(Thought thought) {
 	// 保存
 	Thought persistenced = thoughtDao.save(thought);
-	userToThoughtDAO.save(thought.getAuthorId(), thought.getId());
+	userToThoughtDao.save(thought.getAuthorId(), persistenced.getId());
 	// 启动广播
-	broadcast(thought);
+	broadcast(persistenced);
 	return persistenced.getId();
     }
 }
