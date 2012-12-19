@@ -7,19 +7,15 @@ import java.util.List;
 import ly.step.impl.UserToThoughtDao;
 
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserToThoughtDaoJdbcImpl extends JdbcDaoSupport implements
-	UserToThoughtDao {
+        UserToThoughtDao {
 
     private static final String SQL_INSERT = "insert into user_to_thought (user_id, thought_id, createdAt) values (?,?,?)";
     private static final String SQL_FIND_BY_USER_ID_PREFIX = "select thought_id from user_to_thought where user_id = ?";
     private static final String SQL_FIND_BY_USER_ID_POSTFIX = " order by thought_id desc limit ?";
-
-    @Override
-    public void save(long userId, long thoughtId) {
-	getJdbcTemplate().update(SQL_INSERT, new Object[] {
-		userId, thoughtId, new Date().getTime() });
-    }
 
     @Override
     public List<Long> findByUserId(long userId, long sinceId, long maxId,
@@ -38,7 +34,13 @@ public class UserToThoughtDaoJdbcImpl extends JdbcDaoSupport implements
 	params.add(limit);
 
 	return getJdbcTemplate().queryForList(query.toString(),
-		params.toArray(), Long.class);
+	        params.toArray(), Long.class);
+    }
+
+    @Override
+    public void save(long userId, long thoughtId) {
+	getJdbcTemplate().update(SQL_INSERT, new Object[] {
+	        userId, thoughtId, new Date().getTime() });
     }
 
 }
