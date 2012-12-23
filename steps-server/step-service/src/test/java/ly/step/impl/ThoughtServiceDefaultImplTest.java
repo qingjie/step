@@ -22,7 +22,7 @@ public class ThoughtServiceDefaultImplTest {
     @Mock
     private UserToThoughtDao userToThoughtDao;
     @Mock
-    private UserRelationDao userRelationDao;
+    private FriendDao userRelationDao;
     @Mock
     private ThoughtDao thoughtDao;
     private Thought thought;

@@ -3,19 +3,19 @@ package ly.step.impl.jdbc;
 import java.util.Date;
 import java.util.List;
 
-import ly.step.impl.UserRelationDao;
+import ly.step.impl.FriendDao;
 
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class UserRelationDaoJdbcImpl extends JdbcDaoSupport implements
-        UserRelationDao {
+public class FriendDaoJdbcImpl extends JdbcDaoSupport implements
+        FriendDao {
 
-    private static final String SELECT_BY_FRIEND_A = "select friend_b from User_Relation where friend_a = ?";
-    private static final String SQL_DELETE = "delete from User_Relation where friend_a = ? and friend_b = ?";
-    private static final String SQL_INSERT = "insert into User_Relation (friend_a, friend_b, created_at) values (?, ?, ?)";
+    private static final String SELECT_BY_FRIEND_A = "select friend_id from friend where user_id = ?";
+    private static final String SQL_DELETE = "delete from friend where user_id = ? and friend_id = ?";
+    private static final String SQL_INSERT = "insert into friend (user_id, friend_id, created_at) values (?, ?, ?)";
 
     @Override
     public List<Long> findFriendsByUserId(long userId) {
@@ -42,13 +42,13 @@ public class UserRelationDaoJdbcImpl extends JdbcDaoSupport implements
 	        new Object[] {
 	                friendA,
 	                friendB,
-	                createdAt });
+	                createdAt.getTime() });
 
 	getJdbcTemplate().update(SQL_INSERT,
 	        new Object[] {
-	                friendA,
 	                friendB,
-	                createdAt });
+	                friendA,
+	                createdAt.getTime() });
     }
 
 }

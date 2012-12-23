@@ -26,7 +26,7 @@ public class ThoughtServiceDefaultImpl implements ThoughtService {
     @Autowired
     private UserToThoughtDao userToThoughtDao;
     @Autowired
-    private UserRelationDao userRelationDao;
+    private FriendDao userRelationDao;
 
     private void broadcast(final Thought thought) {
 	List<Long> friendList = userRelationDao

@@ -16,7 +16,7 @@ public class UserServiceDefaultImpl implements UserService {
     @Autowired
     private UserDao userDao;
     @Autowired
-    private UserRelationDao userRelationDao;
+    private FriendDao userRelationDao;
     @Autowired
     private TicketDao ticketDao;
 

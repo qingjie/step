@@ -54,9 +54,11 @@ public class AbstractDaoTestCase {
     protected void dbInit(String tableName) throws DataAccessException,
 	    IOException {
 	getJdbcTemplate().execute("drop table if exists " + tableName);
-	getJdbcTemplate().execute(Resources.toString(
-	        Resources.getResource("db-script/" + tableName + ".sql"),
-	        Charset.forName("utf-8")));
+	getJdbcTemplate().execute(
+	        Resources.toString(
+	                Resources.getResource("db-script/"
+	                        + tableName.toLowerCase() + ".sql"),
+	                Charset.forName("utf-8")));
     }
 
     protected final JdbcTemplate getJdbcTemplate() {

@@ -9,7 +9,7 @@ import java.util.List;
  * @author Dante
  * 
  */
-public interface UserRelationDao {
+public interface FriendDao {
 
     /**
      * 保存一个关系
