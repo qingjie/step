@@ -7,7 +7,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>data-access-jdbc</artifactId>
-	<name>基于Hibernate的数据访问层实现</name>
+	<name>基于JDBC的数据访问层实现</name>
 	<dependencies>
 		<dependency>
 			<groupId>ly.steps</groupId>
