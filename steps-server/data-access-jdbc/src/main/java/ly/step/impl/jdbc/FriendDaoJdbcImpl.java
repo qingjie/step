@@ -17,6 +17,11 @@ public class FriendDaoJdbcImpl extends JdbcDaoSupport implements
     private static final String SQL_DELETE = "delete from friend where user_id = ? and friend_id = ?";
     private static final String SQL_INSERT = "insert into friend (user_id, friend_id, created_at) values (?, ?, ?)";
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.impl.FriendDao#findFriendsByUserId(long)
+     */
     @Override
     public List<Long> findFriendsByUserId(long userId) {
 	return getJdbcTemplate().queryForList(
@@ -24,6 +29,11 @@ public class FriendDaoJdbcImpl extends JdbcDaoSupport implements
 	        new Object[] { userId }, Long.class);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.impl.FriendDao#remove(long, long)
+     */
     @Override
     @Transactional
     public void remove(long friendA, long friendB) {
@@ -35,6 +45,11 @@ public class FriendDaoJdbcImpl extends JdbcDaoSupport implements
 	                new Object[] { friendB, friendA });
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ly.step.impl.FriendDao#save(long, long, java.util.Date)
+     */
     @Override
     @Transactional
     public void save(long friendA, long friendB, Date createdAt) {

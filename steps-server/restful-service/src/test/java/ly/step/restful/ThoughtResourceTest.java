@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.InvocationTargetException;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import ly.step.Thought;
@@ -56,8 +57,10 @@ public class ThoughtResourceTest {
 	        .setId(20).setName("Dante").build());
 	when(mockSecurityContext.getUserPrincipal()).thenReturn(userPrincipal);
 	when(thoughtService.post(any(Thought.class))).thenReturn(1000L);
-	Object result = thoughtResource.post(sample, mockSecurityContext);
-	assertEquals(1000L, result.getClass().getMethod("getId").invoke(result));
+	Response result = thoughtResource.post(sample, mockSecurityContext);
+	assertEquals(1000L, result.getEntity().getClass().getMethod("getId")
+	        .invoke(result.getEntity()));
+	assertEquals(201, result.getStatus());
 
 	ArgumentCaptor<Thought> argumentCaptor = ArgumentCaptor
 	        .forClass(Thought.class);
@@ -66,5 +69,4 @@ public class ThoughtResourceTest {
 	        .getAuthorId());
 	assertNotNull(argumentCaptor.getValue().getCreatedAt());
     }
-
 }

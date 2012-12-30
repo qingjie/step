@@ -1,8 +1,6 @@
 package ly.step.impl.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -33,7 +31,6 @@ public class ThoughtDaoJdbcImplTest extends AbstractDaoTestCase {
 	assertEquals(thoughtList.get(i)[0], thought.getAuthorId());
 	assertEquals(thoughtList.get(i)[1], thought.getText());
 	assertEquals(thoughtList.get(i)[2], thought.getCreatedAt().getTime());
-
     }
 
     @Before
