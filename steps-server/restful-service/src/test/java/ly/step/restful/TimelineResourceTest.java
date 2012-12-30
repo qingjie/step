@@ -49,6 +49,8 @@ public class TimelineResourceTest {
 	when(securityContext.getUserPrincipal())
 	        .thenReturn(
 	                new UserPrincipal(User.newBuilder().setId(10L).build()));
+	ReflectionTestUtils.setField(timelineResource, "securityContext",
+	        securityContext);
 	when(thoughtService.findInTimeline(10, 20, 30, 50))
 	        .thenReturn(Arrays.asList(1L, 2L, 3L));
 	when(thoughtService.findById(anyLong()))
@@ -56,7 +58,7 @@ public class TimelineResourceTest {
 	        .thenReturn(Thought.newBuilder().setId(2L).build())
 	        .thenReturn(Thought.newBuilder().setId(3L).build());
 	TimelineResource.TimelineResult timelineResult = timelineResource
-	        .findInTimeline(securityContext, 20L,
+	        .findInTimeline(20L,
 	                30L, 50);
 
 	assertNotNull(timelineResult);

@@ -15,10 +15,12 @@ import ly.step.Thought;
 import ly.step.ThoughtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @Path("/service/timeline")
+@Scope("prototype")
 public class TimelineResource {
     public static class TimelineResult {
 	private final List<Thought> result;
@@ -34,12 +36,13 @@ public class TimelineResource {
 
     @Autowired
     private ThoughtService thoughtService;
+    @Context
+    private SecurityContext securityContext;
 
     @Path("/")
     @GET
     @Produces({ "application/thought-list+json", "application/thought-list+xml" })
     public TimelineResult findInTimeline(
-	    @Context SecurityContext securityContext,
 	    @DefaultValue("0") @QueryParam("since_id") long sinceId,
 	    @QueryParam("max_id") long maxId,
 	    @DefaultValue("25") @QueryParam("limit") int limit) {

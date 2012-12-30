@@ -26,11 +26,19 @@ public class ThoughtResourceTest {
     private ThoughtResource thoughtResource = new ThoughtResource();
     @Mock
     private ThoughtService thoughtService;
+    @Mock
+    private SecurityContext securityContext;
+    private UserPrincipal userPrincipal;
 
     @Before
     public void setup() throws Exception {
 	ReflectionTestUtils.setField(thoughtResource, "thoughtService",
 	        thoughtService);
+	userPrincipal = new UserPrincipal(User.newBuilder()
+	        .setId(20).setName("Dante").build());
+	when(securityContext.getUserPrincipal()).thenReturn(userPrincipal);
+	ReflectionTestUtils.setField(thoughtResource, "securityContext",
+	        securityContext);
     }
 
     @Test
@@ -52,12 +60,8 @@ public class ThoughtResourceTest {
 	    InvocationTargetException {
 	Thought sample = Thought.newBuilder().setId(1L).setText("Hello, World")
 	        .build();
-	SecurityContext mockSecurityContext = mock(SecurityContext.class);
-	UserPrincipal userPrincipal = new UserPrincipal(User.newBuilder()
-	        .setId(20).setName("Dante").build());
-	when(mockSecurityContext.getUserPrincipal()).thenReturn(userPrincipal);
 	when(thoughtService.post(any(Thought.class))).thenReturn(1000L);
-	Response result = thoughtResource.post(sample, mockSecurityContext);
+	Response result = thoughtResource.post(sample);
 	assertEquals(1000L, result.getEntity().getClass().getMethod("getId")
 	        .invoke(result.getEntity()));
 	assertEquals(201, result.getStatus());

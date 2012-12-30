@@ -17,14 +17,19 @@ import ly.step.Thought;
 import ly.step.ThoughtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @Path("/service/thought")
+@Scope("prototype")
 public class ThoughtResource {
 
     @Autowired
     private ThoughtService thoughtService;
+
+    @Context
+    private SecurityContext securityContext;
 
     @Path("/{id}")
     @GET
@@ -37,8 +42,7 @@ public class ThoughtResource {
     @POST
     @Produces("application/json")
     @Consumes("application/thought+json")
-    public Response post(Thought thought,
-	    @Context SecurityContext securityContext) {
+    public Response post(Thought thought) {
 	UserPrincipal userPrincipal = (UserPrincipal) securityContext
 	        .getUserPrincipal();
 	final long id = thoughtService.post(thought.toBuilder()
