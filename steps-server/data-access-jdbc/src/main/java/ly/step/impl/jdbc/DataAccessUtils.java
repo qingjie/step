@@ -16,7 +16,7 @@ public class DataAccessUtils {
      * 
      * @param result
      *            查询出来的结果集
-     * @return 单个的结果
+     * @return 单个的结果, 如果结果集的数量不是1， 则返回null
      */
     public static <T> T requireSingleResult(List<T> result) {
 	if (result.size() != 1) {

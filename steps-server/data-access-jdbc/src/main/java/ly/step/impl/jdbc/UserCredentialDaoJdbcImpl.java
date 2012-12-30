@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 
-// TODO write unit test
 @Repository
 public class UserCredentialDaoJdbcImpl extends JdbcDaoSupport implements
         UserCredentialDao {
