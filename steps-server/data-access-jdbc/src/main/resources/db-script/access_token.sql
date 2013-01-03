@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS Access_Token (
 	user_id BIGINT NOT NULL,
 	created_at BIGINT NOT NULL,
 	expired_in INT NOT NULL DEFAULT 7,
-	PRIMARY KEY (code)
+	PRIMARY KEY (access_token)
 ) ENGINE = InnoDB;

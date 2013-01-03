@@ -2,6 +2,7 @@ package ly.step.impl.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 import ly.step.AccessToken;
 import ly.step.impl.AccessTokenDao;
@@ -27,7 +28,7 @@ public class AccessTokenDaoJdbcImpl extends JdbcDaoSupport implements
 	getJdbcTemplate().update(SQL_INSERT, new Object[] {
 	        ticket.getAccessToken(),
 	        ticket.getUserId(),
-	        ticket.getCreatedAt(),
+	        ticket.getCreatedAt().getTime(),
 	        ticket.getExpiredInSecond()
 	});
 	return ticket;
@@ -47,9 +48,13 @@ public class AccessTokenDaoJdbcImpl extends JdbcDaoSupport implements
 		    @Override
 		    public AccessToken mapRow(ResultSet rs, int rowNum)
 		            throws SQLException {
-		        return AccessToken.newBuilder()
+		        return AccessToken
+		                .newBuilder()
 		                .setAccessToken(rs.getString("code"))
 		                .setUserId(rs.getLong("user_id"))
+		                .setCreatedAt(
+		                        new Date(rs.getLong("created_at")))
+		                .setExpiredInSecond(rs.getInt("expired_in"))
 		                .build();
 		    }
 
