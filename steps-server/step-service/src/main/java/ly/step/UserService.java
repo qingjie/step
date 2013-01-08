@@ -38,7 +38,7 @@ public interface UserService {
      * 
      * @param accessToken
      *            票据的code
-     * @return 如果返回null， 则意味着没有找到
+     * @return access token 对应的用户
      * @throws AuthenticationException
      *             Access Code 是无效的。可能是 Access Code 不存在或者已经过期了
      */

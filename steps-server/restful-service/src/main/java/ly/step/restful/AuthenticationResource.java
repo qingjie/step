@@ -17,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 @Controller
-@Path("/service/auth")
+@Path("/auth")
 public class AuthenticationResource {
-    private static class AccessTokenResponse {
+    public static class AccessTokenResponse {
 	private final AccessToken accessToken;
 
 	private AccessTokenResponse(AccessToken accessToken) {
@@ -38,7 +38,7 @@ public class AuthenticationResource {
 
 	@JsonProperty("token_type")
 	public String getTokenType() {
-	    return "bearer";
+	    return "Bearer";
 	}
     }
 
@@ -49,7 +49,8 @@ public class AuthenticationResource {
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json;charset=utf-8")
-    public Object passwordGrant(@FormParam("grant_type") String grantType,
+    public Object passwordGrant(
+	    @FormParam("grant_type") String grantType,
 	    @FormParam("username") String username,
 	    @FormParam("password") String password,
 	    @FormParam("scope") String scope) {

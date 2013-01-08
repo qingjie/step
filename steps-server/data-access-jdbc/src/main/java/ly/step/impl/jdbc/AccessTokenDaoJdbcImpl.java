@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 public class AccessTokenDaoJdbcImpl extends JdbcDaoSupport implements
         AccessTokenDao {
 
-    private static final String SQL_FIND_BY_CODE = "select * from Ticket where code = ?";
+    private static final String SQL_FIND_BY_ACCESS_TOKEN = "select * from access_token where access_token = ?";
     private static final String SQL_INSERT = "insert into access_token (access_token, user_id, created_at, expired_in) values (?,?,?,?)";
 
     /*
@@ -40,9 +40,9 @@ public class AccessTokenDaoJdbcImpl extends JdbcDaoSupport implements
      * @see ly.step.impl.AccessTokenDao#findByAccessToken(java.lang.String)
      */
     @Override
-    public AccessToken findByAccessToken(String code) {
+    public AccessToken findByAccessToken(String accessToken) {
 	return DataAccessUtils.requireSingleResult(getJdbcTemplate().query(
-	        SQL_FIND_BY_CODE,
+	        SQL_FIND_BY_ACCESS_TOKEN, new Object[] { accessToken },
 	        new RowMapper<AccessToken>() {
 
 		    @Override
@@ -50,7 +50,7 @@ public class AccessTokenDaoJdbcImpl extends JdbcDaoSupport implements
 		            throws SQLException {
 		        return AccessToken
 		                .newBuilder()
-		                .setAccessToken(rs.getString("code"))
+		                .setAccessToken(rs.getString("access_token"))
 		                .setUserId(rs.getLong("user_id"))
 		                .setCreatedAt(
 		                        new Date(rs.getLong("created_at")))
